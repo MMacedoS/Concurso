@@ -14,19 +14,54 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-$router->group(
-    [], 
-    function () use ($router) {
-		$router->get('/pessoa_fisica', '\App\Http\Controllers\PessoaFisicaController@index');
-		$router->get('/pessoa_fisica/{id}', '\App\Http\Controllers\PessoaFisicaController@show');
-		$router->post('/pessoa_fisica', '\App\Http\Controllers\PessoaFisicaController@store');
-		$router->patch('/pessoa_fisica', '\App\Http\Controllers\PessoaFisicaController@update');
-		$router->patch('/pessoa_fisica/{id}', '\App\Http\Controllers\PessoaFisicaController@destroy');
-		
-		$router->get('/inscricao', '\App\Http\Controllers\InscricaoController@index');
-		$router->get('/inscricao/{id}', '\App\Http\Controllers\InscricaoController@show');
-		$router->post('/inscricao', '\App\Http\Controllers\InscricaoController@store');
-		$router->patch('/inscricao', '\App\Http\Controllers\InscricaoController@update');
-		$router->patch('/inscricao/{id}', '\App\Http\Controllers\InscricaoController@destroy');
-    }
-);
+
+Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
+
+    Route::group(['prefix' => 'pessoa'], function () {
+		Route::get('/', '\App\Http\Controllers\PessoaFisicaController@index');
+		Route::get('/{id}/visualizar', '\App\Http\Controllers\PessoaFisicaController@show');
+		Route::post('/cadastrar', '\App\Http\Controllers\PessoaFisicaController@store');
+		Route::patch('/{id}/atualizar', '\App\Http\Controllers\PessoaFisicaController@update');
+		Route::patch('/{id}/delete', '\App\Http\Controllers\PessoaFisicaController@destroy');
+    });
+
+    Route::group(['prefix' => 'inscricao'], function () {
+		Route::get('/{id}/inscricao', '\App\Http\Controllers\API\InscricaoController@show');
+		Route::post('/cadastrar', '\App\Http\Controllers\API\InscricaoController@store')->name('inscricao.store');
+		Route::patch('/{id}/atualizar', '\App\Http\Controllers\API\InscricaoController@update');
+		Route::patch('/{id}/delete', '\App\Http\Controllers\API\InscricaoController@destroy');
+    });
+
+    Route::group(['prefix' => 'public'], function () {
+		Route::get('/{id}', '\App\Http\Controllers\API\CidadeController@index');
+
+    });
+
+    Route::group(['prefix' => 'cargos'], function () {
+		Route::get('/{id}', '\App\Http\Controllers\API\ConcursoController@show');
+
+    });
+});
+
+Route::group(['prefix' => 'concurso'], function () {
+    Route::get('/', '\App\Http\Controllers\API\ConcursoController@index')->name('concurso');
+    Route::post('/', '\App\Http\Controllers\API\ConcursoController@store')->name('concurso.store');
+
+});
+
+Route::get('/inscricao', '\App\Http\Controllers\API\InscricaoController@index')->name('inscricao');
+Route::get('/estado', '\App\Http\Controllers\API\EstadoController@create')->name('estado');
+Route::post('/estado', '\App\Http\Controllers\API\EstadoController@store')->name('estados.store');
+Route::get('/cidade', '\App\Http\Controllers\API\CidadeController@create')->name('cidade');
+Route::post('/cidade', '\App\Http\Controllers\API\CidadeController@store')->name('cidade.store');
+
+Route::get('/', '\App\Http\Controllers\API\LoginController@index')->name('login');
+
+Route::get('/registrar', '\App\Http\Controllers\API\RegistroController@index')->name('registrar');
+Route::post('/registrar', '\App\Http\Controllers\API\RegistroController@store')->name('registro.store');
+
+// Route::middleware('auth:api')->group(function(){
+    Route::post('/', '\App\Http\Controllers\API\LoginController@store')->name('login.store');
+// });
+Route::get('/{id}', '\App\Http\Controllers\API\InscricaoController@comprovante')->name('comprovante');
+

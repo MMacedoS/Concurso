@@ -1,0 +1,41 @@
+version: '3'
+services:
+    web:
+        container_name: "concurso"
+        image: ambientum/php:7.4-nginx
+        ports:
+            - '8080:8080'
+        volumes:
+            - '.:/var/www/app'
+        depends_on:
+            - 'database'
+        links:
+            - 'database'
+    database:
+        container_name: 'concurso-database'
+        platform: linux/x86_64
+        image: mysql:8
+        command: --default-authentication-plugin=mysql_native_password
+        ports:
+            - '3306:3306'
+        volumes:
+            - "./data/db/mysql:/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: '123456'
+            MYSQL_DATABASE: 'concurso'
+            MYSQL_USER: 'echo'
+            MYSQL_PASSWORD: '123456'
+
+    phpmyadmin:
+        container_name: pma
+        image: phpmyadmin/phpmyadmin
+        links:
+            -  database
+        environment:
+             PMA_HOST: database
+             PMA_PORT: 3306
+             PMA_ARBITRARY: 1
+        restart: always
+        ports:
+            - 8081:80
+
